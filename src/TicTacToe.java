@@ -110,7 +110,7 @@ class TicTacToe {
     }
 
     private boolean nextPlayerMove(int number) {
-        int x = number / 3;
+        int x = (number - 1) / 3;
         int y = (number - 1) - (number - 1) / 3 * 3;
 
         if(isPositionBlocked(x, y)) {
@@ -195,6 +195,9 @@ class Main {
 
     public static void main(String[] args) {
         TicTacToe game = new TicTacToe();
+
+        if((int)(Math.random() * 2) == 0)
+            game.nextAIMove();
 
         game.printField();
 
