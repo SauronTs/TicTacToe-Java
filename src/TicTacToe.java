@@ -1,14 +1,14 @@
 import java.util.*;
 
 class TicTacToe {
-    private char[][] field = new char[3][3];
+    private final char[][] field = new char[3][3];
 
     private static final char emptyChar = '#';
     private static final char playerChar = 'X';
     private static final char aiChar = 'O';
     private boolean gameIsRunning = true;
 
-    private final HashMap<Character, Integer> scores = new HashMap<Character, Integer>();
+    private final HashMap<Character, Integer> scores = new HashMap<>();
 
     public boolean getGame() {
         return gameIsRunning;
@@ -26,7 +26,7 @@ class TicTacToe {
 
     public void printField() {
         System.out.println("----------------------------------\n");
-        for(char i[] : this.field) {
+        for(char[] i : this.field) {
             for(char a : i) {
                 System.out.print(a + "  ");
             }
@@ -134,7 +134,7 @@ class TicTacToe {
         if(player)
             mark = playerChar;
 
-        if(x < 0 && x > 2 || y < 0 && x > 2)
+        if(!(x >= 0 && x <= 2 || y >= 0 && y <= 2))
             return;
 
         this.field[x][y] = mark;
