@@ -1,5 +1,15 @@
 import java.util.*;
 
+class Position {
+    public int x;
+    public int y;
+
+    Position(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 class TicTacToe {
     private final char[][] field = new char[3][3];
 
@@ -20,8 +30,8 @@ class TicTacToe {
                 this.field[i][a] = emptyChar;
         }
 
-        scores.put(playerChar, -1);
-        scores.put(aiChar, 1);
+        scores.put(playerChar, 1);
+        scores.put(aiChar, 3);
     }
 
     public void printField() {
@@ -36,11 +46,11 @@ class TicTacToe {
         if(gameIsRunning) {
             System.out.print("\nInput: ");
         }else {
-            if(hasWon() == -1) {
+            if(hasWon() == 1) {
                 System.out.println("Player has won");
-            }else if(hasWon() == 1) {
+            }else if(hasWon() == 3) {
                 System.out.println("AI has won.");
-            }else if(hasWon() == 0) {
+            }else if(hasWon() == 2) {
                 System.out.println("No one has won");
             }
         }
@@ -51,32 +61,37 @@ class TicTacToe {
     }
 
     public void nextAIMove() {
-        int bestScore = Integer.MIN_VALUE;
-        int bestX = 0, bestY = 0;
+        int bestScore = 1;
+        Map<Position, Integer> moves = new HashMap<>();
+        List<Position> bestMoves = new ArrayList<>();
 
         for(int i = 0; i < 3; ++i) {
             for(int a = 0; a < 3; ++a) {
                 if(!isPositionBlocked(i, a)) {
                     setPosition(i, a, false);
-                    int score = minimax(0, false);
+                    int score = minimax(0,false);
                     deletePosition(i, a);
-                    if(score > bestScore) {
+                    moves.put(new Position(i, a), score);
+                    if(score > bestScore)
                         bestScore = score;
-                        bestX = i;
-                        bestY = a;
-                    }
                 }
             }
         }
 
-        setPosition(bestX, bestY, false);
+        for(java.util.Map.Entry<Position, Integer> entry : moves.entrySet()) {
+            if(entry.getValue() == bestScore)
+                bestMoves.add(entry.getKey());
+        }
+
+        Position random = bestMoves.get((int)(Math.random() * bestMoves.size()));
+        setPosition(random.x, random.y, false);
 
         if(hasWon() != -2)
             gameIsRunning = false;
     }
 
     private int minimax(int depth, boolean isMax) {
-        int bestScore = Integer.MIN_VALUE;
+        int bestScore = 1;
         int result = hasWon();
 
         if(result != -2) {
@@ -84,7 +99,7 @@ class TicTacToe {
         }
 
         if(!isMax)
-            bestScore = Integer.MAX_VALUE;
+            bestScore = 3;
 
         for(int i = 0; i < 3; ++i) {
             for(int a = 0; a < 3; ++a) {
@@ -102,7 +117,7 @@ class TicTacToe {
         }
 
 
-        return bestScore;
+        return bestScore ;
     }
 
     private boolean isNumber(char input) {
@@ -152,7 +167,7 @@ class TicTacToe {
         return true;
     }
 
-    public int hasWon() {
+    private int hasWon() {
 
         for(int i = 0; i < 3; ++i) {
             if(this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i]) {
@@ -169,7 +184,7 @@ class TicTacToe {
             return scores.get(field[1][1]);
 
         if(fieldIsFull()) {
-            return 0;
+            return 2;
         }
 
         return -2;
