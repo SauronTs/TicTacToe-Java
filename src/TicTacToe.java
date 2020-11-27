@@ -34,6 +34,16 @@ class TicTacToe {
         scores.put(aiChar, 3);
     }
 
+    public void resetField() {
+        for(int i = 0; i < 3; ++i)
+            for(int a = 0; a < 3; ++a)
+                field[i][a] = emptyChar;
+    }
+
+    public void setGameStatus(boolean status) {
+        gameIsRunning = status;
+    }
+
     public void printField() {
         System.out.println("----------------------------------\n");
         for(char[] i : this.field) {
@@ -60,20 +70,30 @@ class TicTacToe {
         return this.field[x][y] != emptyChar;
     }
 
-    public void nextAIMove() {
+    public boolean nextAIMove(boolean firstMove) {
         int bestScore = 1;
         Map<Position, Integer> moves = new HashMap<>();
         List<Position> bestMoves = new ArrayList<>();
 
+        if(firstMove)
+            bestScore = 3;
+
         for(int i = 0; i < 3; ++i) {
             for(int a = 0; a < 3; ++a) {
                 if(!isPositionBlocked(i, a)) {
-                    setPosition(i, a, false);
-                    int score = minimax(0,false);
+                    setPosition(i, a, firstMove);
+                    int score = minimax(0,firstMove);
                     deletePosition(i, a);
                     moves.put(new Position(i, a), score);
-                    if(score > bestScore)
-                        bestScore = score;
+                    if(firstMove) {
+                        if(score < bestScore) {
+                            bestScore = score;
+                        }
+                    }else {
+                        if(score > bestScore) {
+                            bestScore = score;
+                        }
+                    }
                 }
             }
         }
@@ -84,10 +104,14 @@ class TicTacToe {
         }
 
         Position random = bestMoves.get((int)(Math.random() * bestMoves.size()));
-        setPosition(random.x, random.y, false);
+        setPosition(random.x, random.y, firstMove);
 
-        if(hasWon() != -2)
+        if(hasWon() != -2) {
             gameIsRunning = false;
+            return false;
+        }
+
+        return true;
     }
 
     private int minimax(int depth, boolean isMax) {
@@ -124,25 +148,6 @@ class TicTacToe {
         return input >= '0' && input <= '9';
     }
 
-    private boolean nextPlayerMove(int number) {
-        int x = (number - 1) / 3;
-        int y = (number - 1) - (number - 1) / 3 * 3;
-
-        if(isPositionBlocked(x, y)) {
-            System.out.println("Player move was illegal");
-            return false;
-        }
-
-        setPosition(x, y, true);
-
-        if(hasWon() != -2) {
-            gameIsRunning = false;
-            return false;
-        }
-
-        return true;
-    }
-
     private void setPosition(int x, int y, boolean player) {
         char mark = aiChar;
 
@@ -167,7 +172,7 @@ class TicTacToe {
         return true;
     }
 
-    private int hasWon() {
+    public int hasWon() {
 
         for(int i = 0; i < 3; ++i) {
             if(this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i]) {
@@ -190,18 +195,11 @@ class TicTacToe {
         return -2;
     }
 
-    //TODO: Optimize
-    public void getInput(char input) {
-        if(!isNumber(input)) {
-            System.out.println("Input is not a valid number");
-            return;
-        }
+    public void performMoves() {
+        if(nextAIMove(true))
+            nextAIMove(false);
 
-        if(nextPlayerMove(input - '0')) {
-            nextAIMove();
-        }
-
-        if(hasWon() == 0)
+        if(hasWon() == 2)
             gameIsRunning = false;
     }
 }
@@ -212,20 +210,35 @@ class Main {
         TicTacToe game = new TicTacToe();
 
         if((int)(Math.random() * 2) == 0)
-            game.nextAIMove();
+            game.nextAIMove(false);
 
-        game.printField();
+        int playerWon = 0, aiWon = 0, noWon = 0;
+        int counter = 0;
+        int end = 10;
 
-        Scanner scanner = new Scanner(System.in);
-        char input = ' ';
+        while(counter < end) {
+            game.performMoves();
 
-        while(input != 'q' && game.getGame()) {
-            String rawInput = scanner.nextLine();
-            if(rawInput.length() != 0)
-                input = rawInput.charAt(0);
+            int status = game.hasWon();
+            if(status != -2) {
+                switch(status) {
+                    case 1:
+                        ++playerWon;
+                        break;
+                    case 2:
+                        ++noWon;
+                        break;
+                    case 3:
+                        ++aiWon;
+                        break;
+                }
 
-            game.getInput(input);
-            game.printField();
+                game.resetField();
+                game.setGameStatus(true);
+                ++counter;
+            }
         }
+
+        System.out.println("Player: " + playerWon + "\nAI: " + aiWon + "\nNo: " + noWon);
     }
 }
