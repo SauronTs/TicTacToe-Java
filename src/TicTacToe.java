@@ -144,8 +144,15 @@ class TicTacToe {
         return bestScore ;
     }
 
-    private boolean isNumber(char input) {
+    public static boolean isNumber(char input) {
         return input >= '0' && input <= '9';
+    }
+
+    public static boolean strIsNumber(String str) {
+        for(int i = 0; i < str.length(); ++i)
+            if(!isNumber(str.charAt(i)))
+                return false;
+            return true;
     }
 
     private void setPosition(int x, int y, boolean player) {
@@ -216,21 +223,27 @@ class Main {
         int counter = 0;
         int end = 10;
 
+        if(args.length == 1) {
+            if(TicTacToe.strIsNumber((args[0]))) {
+                end = Integer.parseInt(args[0]);
+            }else {
+                System.out.println("Argument must be a number!");
+                return;
+            }
+        }else {
+            System.out.println("usage: [arg1]\narg1 (optional): Number of games. Default: " + end + ".");
+            return;
+        }
+
         while(counter < end) {
             game.performMoves();
 
             int status = game.hasWon();
             if(status != -2) {
-                switch(status) {
-                    case 1:
-                        ++playerWon;
-                        break;
-                    case 2:
-                        ++noWon;
-                        break;
-                    case 3:
-                        ++aiWon;
-                        break;
+                switch (status) {
+                    case 1 -> ++playerWon;
+                    case 2 -> ++noWon;
+                    case 3 -> ++aiWon;
                 }
 
                 game.resetField();
