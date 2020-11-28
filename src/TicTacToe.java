@@ -1,5 +1,7 @@
 import java.util.*;
 
+import static java.lang.Character.isDigit;
+
 class Position {
     public int x;
     public int y;
@@ -150,7 +152,7 @@ class TicTacToe {
 
     public static boolean strIsNumber(String str) {
         for(int i = 0; i < str.length(); ++i)
-            if(!isNumber(str.charAt(i)))
+            if(!isDigit(str.charAt(i)))
                 return false;
             return true;
     }
