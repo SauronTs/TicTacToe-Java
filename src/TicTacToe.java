@@ -221,7 +221,7 @@ class Main {
 
         int playerWon = 0, aiWon = 0, noWon = 0;
         int counter = 0;
-        int end = 10;
+        int end = 0;
 
         if(args.length == 1) {
             if(TicTacToe.strIsNumber((args[0]))) {
@@ -231,7 +231,7 @@ class Main {
                 return;
             }
         }else {
-            System.out.println("usage: [arg1]\narg1 (optional): Number of games. Default: " + end + ".");
+            System.out.println("usage: [arg1]\narg1 (required): Number of games.");
             return;
         }
 
